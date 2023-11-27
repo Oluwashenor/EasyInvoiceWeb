@@ -140,6 +140,10 @@ namespace EasyInvoiceWeb.Data.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 

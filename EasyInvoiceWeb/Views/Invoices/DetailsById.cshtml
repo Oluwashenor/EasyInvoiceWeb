@@ -22,20 +22,19 @@
             @Html.DisplayFor(model => model.Invoice.Business)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Invoice.InvoiceNumber)
+           Invoice Number
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Invoice.InvoiceNumber)
-        </dd>
-        
+        </dd>   
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Invoice.DueDate)
+            Due Date
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Invoice.DueDate)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Invoice.TotalAmount)
+            Amount
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Invoice.TotalAmount)
@@ -55,7 +54,7 @@
 
     <form id="paymentForm">
         <div class="form-submit">
-            <button type="submit" onclick="payWithPaystack()"> Pay </button>
+            <button class="btn btn-primary" type="submit" onclick="payWithPaystack()"> Pay Now</button>
         </div>
     </form>
 }
@@ -79,8 +78,6 @@
                         <th>
                             Amount
                         </th>
-                        
-                      
                     </tr>
                 </thead>
                 <tbody>
@@ -118,16 +115,35 @@
     const invoice = @Html.Raw(JsonConvert.SerializeObject(Model.Invoice.InvoiceNumber));
     const public_key = "pk_test_1bb87bdbfd3c08ac0cfc61f5b27f21657aa8f214";
     let genRef = undefined;
+    var baseUrl = window.location.origin;
 
     const paymentForm = document.getElementById('paymentForm');
     paymentForm.addEventListener("submit", payWithPaystack, false);
 
-    var baseUrl = window.location.origin;
+    function verifyInvoice(){
+        $.ajax({
+            url: baseUrl + "/Invoices/InvoiceStatus",
+            method: 'get',
+            data: { InvoiceNumber: invoice },
+            success: function (response) {
+                console.log(response);
+                toastr.success('Payment Successful');
+                setTimeout(() => { window.location.replace(window.location.href); }, 2000);
+            },
+            error: function (response) {
+                console.log(response);
+                toastr.error('Payment Failed');
+            }
+
+        });
+    }
+
+
+    
     var url = baseUrl + "/Payments/VerifyPayment/";
 
     function payWithPaystack(e) {
         e.preventDefault();
-
         let handler = PaystackPop.setup({
             key: public_key, // Replace with your public key
             email: customerEmail,
@@ -145,9 +161,7 @@
                     success: function (response) {
                         console.log(response);
                         toastr.success('Payment Successful');
-                        $("#SaveOrder").click();
-                        //window.location.replace(baseUrl + "/Orders");
-                        // the transaction status is in response.data.status
+                        setTimeout(() => { window.location.replace(window.location.href); }, 2000);
                     },
                     error: function (response) {
                         console.log(response);

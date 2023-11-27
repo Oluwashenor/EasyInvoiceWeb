@@ -55,18 +55,22 @@
 
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="col">
-                            <input type="text" asp-for="@Model.CreateClient.Name" class="form-control" placeholder="Client Name">
+                            <label for="inputEmail4">Client Name</label>
+                            <input type="text" required asp-for="@Model.CreateClient.Name" class="form-control" placeholder="Client Name">
                         </div>
                         <div class="col">
-                            <input type="text" asp-for="@Model.CreateClient.Email" class="form-control" placeholder="Client Email">
+                            <label for="inputEmail4">Client Email</label>
+                            <input type="text" required asp-for="@Model.CreateClient.Email" class="form-control" placeholder="Client Email">
                         </div>
                     </div>
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="col">
-                            <input type="text" asp-for="@Model.CreateClient.ContactNumber" class="form-control" placeholder="Contact Phone">
+                            <label for="inputEmail4">Contact Phone</label>
+                            <input type="text" required asp-for="@Model.CreateClient.ContactNumber" class="form-control" placeholder="Contact Phone">
                         </div>
                         <div class="col">
-                            <input type="text" asp-for="@Model.CreateClient.Address" class="form-control" placeholder="Contact Address">
+                            <label for="inputEmail4">Contact Address</label>
+                            <input type="text" required asp-for="@Model.CreateClient.Address" class="form-control" placeholder="Contact Address">
                         </div>
                     </div>
                    

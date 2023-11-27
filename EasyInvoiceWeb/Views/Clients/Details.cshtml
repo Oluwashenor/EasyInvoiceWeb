@@ -43,7 +43,7 @@
 
 <!-- Button trigger modal -->
 <button class="btn btn-primary" style="margin-bottom:20px;" data-toggle="modal" data-target="#exampleModal">
-    Generate Invoice
+    New Invoice
 </button>
 
 <!-- Modal -->
@@ -58,21 +58,22 @@
             </div>
             <form asp-controller="Invoices" asp-action="Create">
                 <div class="modal-body">
-
                     <div class="form-row" style="margin-bottom:15px;">
-                        <div class="col">
-                            <input type="text" asp-for="@Model.CreateInvoice.TotalAmount" class="form-control" placeholder="Client Name">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Amount</label>
+                            <input type="number" required asp-for="@Model.CreateInvoice.TotalAmount" class="form-control" placeholder="Amount">
                         </div>
-                        <div class="col">
-                            <input type="datetime-local" asp-for="@Model.CreateInvoice.DueDate" class="form-control" placeholder="Client Email">
+                        <div class="form-group col-md-6">
+                            <label for="inputPassword4">Due Date</label>
+                            <input type="datetime-local" required asp-for="@Model.CreateInvoice.DueDate" class="form-control" placeholder="">
                         </div>
                     </div>
+                   
                     <div class="form-row" style="margin-bottom:15px;">
                         <div class="col">
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-
+                            <label for="inputPassword4">Invoice Description</label>
+                            <textarea class="form-control" asp-for="@Model.CreateInvoice.Description" required id="exampleFormControlTextarea1" rows="3"></textarea>
                         </div>
-
                     </div>
                     <input type="hidden" asp-for="@Model.CreateInvoice.BusinessId" value="@Model.Client.BusinessId" class="form-control">
                     <input type="hidden" asp-for="@Model.CreateInvoice.ClientId" value="@Model.Client.Id" class="form-control">
@@ -134,15 +135,22 @@
                                 @Html.DisplayFor(modelItem => item.DueDate)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.TotalAmount)
+                                ₦  @Html.DisplayFor(modelItem => item.TotalAmount)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Status)
-                            </td>
-                            <td>
+                                @if(item.Status == EasyInvoiceWeb.Utilities.Enums.InvoiceStatus.Paid)
+                                {
+                                    <span class="badge badge-success"> @Html.DisplayFor(modelItem => item.Status)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger"> @Html.DisplayFor(modelItem => item.Status)</span>
+                                }
 
-                                <button class="btn btn-outline-primary" onclick="copyContent(@item.InvoiceNumber)">Share</button> |
-                                <a class="btn btn-outline-danger" asp-controller="Clients" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-primary" onclick="copyContent('@item.InvoiceNumber')">Share</button>
+                                @* <a class="btn btn-outline-danger" asp-controller="Clients" asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
                             </td>
                         </tr>
                     }
@@ -154,11 +162,14 @@
 
 
 <script>
+
     let text = "https://localhost:7218/Invoices/DetailsById/";
+    console.log(text);
     const copyContent = async (id) => {
         try {
             await navigator.clipboard.writeText(text+id);
-            console.log('Content copied to clipboard');
+            console.log('Invoice URL copied to clipboard');
+            toastr.success('Invoice URL copied to clipboard');
         } catch (err) {
             console.error('Failed to copy: ', err);
         }

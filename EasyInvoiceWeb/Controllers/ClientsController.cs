@@ -62,7 +62,7 @@ namespace EasyInvoiceWeb.Controllers
                 },
                 CreateInvoice = new()
                 {
-                    DueDate = DateTime.Now
+                    DueDate = DateTime.Now.AddDays(5)
                 },
                 Invoices = invoices.Select(x=> new InvoiceViewModel()
                 {

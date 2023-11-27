@@ -13,6 +13,7 @@ namespace EasyInvoiceWeb.ViewModels
         public string Business { get; set; }
         public string InvoiceNumber { get; set; }
         public DateTime DueDate { get; set; }
+        public DateTime IssuedDate { get; set; }
         public double TotalAmount { get; set; }
         public InvoiceStatus Status { get; set; }
     }
@@ -23,6 +24,7 @@ namespace EasyInvoiceWeb.ViewModels
         public long BusinessId { get; set; }
         public DateTime DueDate { get; set; }
         public double TotalAmount { get; set; }
+        public string Description { get; set; }
     }
 
     public class InvoiceDetail

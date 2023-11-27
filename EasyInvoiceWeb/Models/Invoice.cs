@@ -9,6 +9,7 @@ namespace EasyInvoiceWeb.Models
         public long BusinessId { get; set; }
         public Business Business { get; set; }
         public string InvoiceNumber { get; set; }
+        public string Description { get; set; }
         public DateTime IssueDate { get; set; } = DateTime.Now;
         public DateTime DueDate { get; set; }
         public double TotalAmount { get; set; }

@@ -8,23 +8,43 @@ using Microsoft.EntityFrameworkCore;
 using EasyInvoiceWeb.Data;
 using EasyInvoiceWeb.Models;
 using EasyInvoiceWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EasyInvoiceWeb.Controllers
 {
-    public class InvoicesController : Controller
+    [Authorize]
+    public class InvoicesController : BaseController
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public InvoicesController(ApplicationDbContext context)
+        public InvoicesController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Invoices
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Invoice.Include(i => i.Business).Include(i => i.Client);
-            return View(await applicationDbContext.ToListAsync());
+            var user = _userManager.GetUserId(User);
+            var businesses = await _context.Business.Where(x => x.UserId == user).Select(x=>x.Id).ToListAsync();
+            var invoices = _context.Invoice.Where(x=> businesses.Contains(x.BusinessId)).Include(i => i.Business).Include(i => i.Client).Select(x=> new InvoiceViewModel()
+            {
+                 Business = x.Business.Name,
+                 BusinessId = x.BusinessId,
+                 Client = x.Client.ClientName,
+                 ClientEmail = x.Client.Email,
+                 ClientId = x.ClientId,
+                 DueDate = x.DueDate,
+                 Id = x.Id,
+                 InvoiceNumber = x.InvoiceNumber,
+                 Status = x.Status,
+                 TotalAmount = x.TotalAmount,
+                 IssuedDate = x.IssueDate
+            }).ToList();
+            return View(invoices);
         }
 
         // GET: Invoices/Details/5
@@ -47,6 +67,7 @@ namespace EasyInvoiceWeb.Controllers
             return View(invoice);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> DetailsById(string? id)
         {
 
@@ -80,6 +101,14 @@ namespace EasyInvoiceWeb.Controllers
             return View(viewModel);
         }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> InvoiceStatus(string invoiceNumber)
+        {
+            var invoice = await _context.Invoice.FirstOrDefaultAsync(x=>x.InvoiceNumber ==  invoiceNumber);
+            var status = invoice == null ? false : invoice.Status == Utilities.Enums.InvoiceStatus.Paid;
+            return Ok(status);
+        }
+
         // GET: Invoices/Create
         //public IActionResult Create()
         //{
@@ -100,6 +129,12 @@ namespace EasyInvoiceWeb.Controllers
             {
                 if(model.CreateInvoice.TotalAmount <= 0)
                 {
+                    DisplayError("Amount cannot be 0 or less");
+                    return RedirectToAction(nameof(Details), "Clients", new { id = model.CreateInvoice.ClientId });
+                }
+                if(model.CreateInvoice.DueDate < DateTime.Now)
+                {
+                    DisplayError("Due Date has to be in the future");
                     return RedirectToAction(nameof(Details), "Clients", new { id = model.CreateInvoice.ClientId });
                 }
                 var invoice = new Invoice()
@@ -110,6 +145,7 @@ namespace EasyInvoiceWeb.Controllers
                     ClientId = model.CreateInvoice.ClientId,
                     Status = Utilities.Enums.InvoiceStatus.Unpaid,
                     TotalAmount = model.CreateInvoice.TotalAmount,
+                    Description = model.CreateInvoice.Description,
                 };
                 _context.Add(invoice);
                 await _context.SaveChangesAsync();
