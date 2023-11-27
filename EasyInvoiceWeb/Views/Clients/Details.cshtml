@@ -1,0 +1,166 @@
+﻿@model EasyInvoiceWeb.ViewModels.ClientDetailViewModel
+
+@{
+    ViewData["Title"] = "Client Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Business Name
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Client.Business)
+        </dd>
+        <dt class="col-sm-2">
+            Client's Name
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Client.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Client.ContactNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Client.ContactNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Client.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Client.Email)
+        </dd>
+    </dl>
+</div>
+@* <div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+ *@
+
+<!-- Button trigger modal -->
+<button class="btn btn-primary" style="margin-bottom:20px;" data-toggle="modal" data-target="#exampleModal">
+    Generate Invoice
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create Invoice</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-controller="Invoices" asp-action="Create">
+                <div class="modal-body">
+
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="col">
+                            <input type="text" asp-for="@Model.CreateInvoice.TotalAmount" class="form-control" placeholder="Client Name">
+                        </div>
+                        <div class="col">
+                            <input type="datetime-local" asp-for="@Model.CreateInvoice.DueDate" class="form-control" placeholder="Client Email">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="col">
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+
+                        </div>
+
+                    </div>
+                    <input type="hidden" asp-for="@Model.CreateInvoice.BusinessId" value="@Model.Client.BusinessId" class="form-control">
+                    <input type="hidden" asp-for="@Model.CreateInvoice.ClientId" value="@Model.Client.Id" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Client's Invoices</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            Invoice ID
+                        </th>
+                        <th>
+                            Due Date
+                        </th>
+                        <th>
+                            Cost
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var counter = 0;
+                    }
+                    @foreach (var item in Model.Invoices)
+                    {
+                        counter = counter + 1;
+                        <tr>
+                            <td>
+                                @counter
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.InvoiceNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DueDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TotalAmount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                            <td>
+
+                                <button class="btn btn-outline-primary" onclick="copyContent(@item.InvoiceNumber)">Share</button> |
+                                <a class="btn btn-outline-danger" asp-controller="Clients" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let text = "https://localhost:7218/Invoices/DetailsById/";
+    const copyContent = async (id) => {
+        try {
+            await navigator.clipboard.writeText(text+id);
+            console.log('Content copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+        }
+    }
+</script>

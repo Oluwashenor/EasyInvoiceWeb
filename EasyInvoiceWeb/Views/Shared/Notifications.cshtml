@@ -1,0 +1,35 @@
+﻿@using EasyInvoiceWeb.Utilities.Constants
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" crossorigin="anonymous" />
+
+<script src="~/lib/jquery/dist/jquery.min.toast.js">
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+@if (TempData[Toastr.Success] != null)
+{
+    <script type="text/javascript">
+        toastr.success('@TempData[Toastr.Success]');
+    </script>
+}
+@if (TempData[Toastr.Error] != null)
+{
+    <script type="text/javascript">
+        toastr.error('@TempData[Toastr.Error]');
+    </script>
+}
+@if (TempData[Toastr.Info] != null)
+{
+    <script type="text/javascript">
+        toastr.info('@TempData[Toastr.Info]');
+    </script>
+}
+@if (TempData[Toastr.Warning] != null)
+{
+    <script type="text/javascript">
+        toastr.warning('@TempData[Toastr.Warning]');
+    </script>
+}
+
+

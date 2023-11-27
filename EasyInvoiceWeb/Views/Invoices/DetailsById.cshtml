@@ -1,0 +1,164 @@
+﻿@using Newtonsoft.Json
+@model EasyInvoiceWeb.ViewModels.InvoiceDetail
+
+@{
+    ViewData["Title"] = "Invoice Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.Client)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.ClientEmail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.Business)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.Business)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.InvoiceNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.InvoiceNumber)
+        </dd>
+        
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.DueDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.DueDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.TotalAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.TotalAmount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Invoice.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Invoice.Status)
+        </dd>
+       
+    </dl>
+</div>
+
+@if(Model.Invoice.Status != EasyInvoiceWeb.Utilities.Enums.InvoiceStatus.Paid)
+{
+
+    <form id="paymentForm">
+        <div class="form-submit">
+            <button type="submit" onclick="payWithPaystack()"> Pay </button>
+        </div>
+    </form>
+}
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Payment History</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                           Payment Date
+                        </th>
+                        <th>
+                            Amount
+                        </th>
+                        
+                      
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var counter = 0;
+                    }
+                    @foreach (var item in Model.Payments)
+                    {
+                        counter = counter + 1;
+                        <tr>
+                            <td>
+                                @counter
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PaymentDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AmountPaid)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+    const customerEmail = @Html.Raw(JsonConvert.SerializeObject(Model.Invoice.ClientEmail));
+    const cost = @Html.Raw(JsonConvert.SerializeObject(Model.Invoice.TotalAmount));
+    const invoice = @Html.Raw(JsonConvert.SerializeObject(Model.Invoice.InvoiceNumber));
+    const public_key = "pk_test_1bb87bdbfd3c08ac0cfc61f5b27f21657aa8f214";
+    let genRef = undefined;
+
+    const paymentForm = document.getElementById('paymentForm');
+    paymentForm.addEventListener("submit", payWithPaystack, false);
+
+    var baseUrl = window.location.origin;
+    var url = baseUrl + "/Payments/VerifyPayment/";
+
+    function payWithPaystack(e) {
+        e.preventDefault();
+
+        let handler = PaystackPop.setup({
+            key: public_key, // Replace with your public key
+            email: customerEmail,
+            amount: cost * 100,
+             onClose: function () {
+                alert('Window closed.');
+            },
+            callback: function (response) {
+                let message = 'Payment complete! Reference: ' + response.reference;
+                genRef = response.reference;
+                $.ajax({
+                    url: url,
+                    method: 'get',
+                    data: { Reference: genRef, Invoice: invoice },
+                    success: function (response) {
+                        console.log(response);
+                        toastr.success('Payment Successful');
+                        $("#SaveOrder").click();
+                        //window.location.replace(baseUrl + "/Orders");
+                        // the transaction status is in response.data.status
+                    },
+                    error: function (response) {
+                        console.log(response);
+                        toastr.error('Payment Failed');
+                    }
+
+                });
+            }
+        });
+
+        handler.openIframe();
+    }
+
+</script>

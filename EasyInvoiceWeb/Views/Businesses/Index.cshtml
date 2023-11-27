@@ -1,0 +1,128 @@
+﻿@using EasyInvoiceWeb.ViewModels
+@model BusinessViewModel
+
+@{
+    ViewData["Title"] = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Button trigger modal -->
+<button class="btn btn-primary" style="margin-bottom:20px;" data-toggle="modal" data-target="#exampleModal">
+    Add Business
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create Business</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-controller="Businesses" asp-action="Create">
+            <div class="modal-body">
+               
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="col">
+                            <input type="text" asp-for="@Model.CreateBusiness.Name" class="form-control" placeholder="Business Name">
+                        </div>
+                        <div class="col">
+                            <input type="text" asp-for="@Model.CreateBusiness.Email" class="form-control" placeholder="Business Email">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="col">
+                            <input type="text" asp-for="@Model.CreateBusiness.ContactNumber" class="form-control" placeholder="Contact Phone">
+                        </div>
+                        <div class="col">
+                            <input type="text" asp-for="@Model.CreateBusiness.Address" class="form-control" placeholder="Contact Address">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:15px;">
+                        <div class="col">
+                            <input type="text" class="form-control" asp-for="@Model.CreateBusiness.Bank" placeholder="Bank Name">
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control" asp-for="@Model.CreateBusiness.AccountNumber" placeholder="Account Number">
+                        </div>
+                    </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">My Business</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                           Business
+                        </th>
+                        <th>
+                            Phone
+                        </th>
+                        <th>
+                            Address
+                        </th>
+                        <th>
+                            Account Number
+                        </th>
+                        <th>
+                            Bank
+                        </th>
+                        <th></th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @{var count = 0;}
+                    @foreach (var item in Model.Businesses)
+                    {
+                        count = count + 1;
+                        <tr>
+                            <td>@count</td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ContactNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Address)
+                            </td>
+                           
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AccountNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Bank)
+                            </td>
+                            
+                            <td>
+                                <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
